@@ -31,7 +31,7 @@ func TestPublishedTweetIsSaved(t *testing.T) {
 	}
 
 }*/
-
+/*
 func TestTweetWithoutTextIsNotPublished(t *testing.T) {
 
 	var tweet *domain.Tweet
@@ -86,9 +86,29 @@ func TestAsdf(t *testing.T) {
 	if !isValidTweet(t, secondPublishedTweet, user, text) {
 		return
 	}
+}*/
+
+func isValidTweet(t *testing.T, firstPublishedTweet *domain.Tweet, user domain.User, text string, id int) bool {
+	res := firstPublishedTweet.User == user && firstPublishedTweet.Text == text //&& service.GetTweets[id] == firstPublishedTweet
+	return res
 }
 
-func isValidTweet(t *testing.T, firstPublishedTweet *domain.Tweet, user string, text string) bool {
-	res := firstPublishedTweet.User == user && firstPublishedTweet.Text == text
-	return res
+func TestCanRetrieveTweetById(t *testing.T) {
+
+	service.InitializeService()
+
+	var tweet *domain.Tweet
+	var id int
+
+	var user domain.User
+	user.User = "grupoesfera"
+	text := "tweet"
+
+	tweet = domain.NewTweet(user, text)
+
+	id, _ = service.PublishTweet(tweet)
+
+	publishedTweet := service.GetTweetById(id)
+
+	isValidTweet(t, publishedTweet, user, text, id)
 }

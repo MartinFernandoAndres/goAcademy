@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/abiosoft/ishell"
 	"github.com/goAcademy/src/domain"
 	"github.com/goAcademy/src/service"
@@ -25,7 +27,9 @@ func main() {
 
 			c.Print("Write your user: ")
 
-			user := c.ReadLine()
+			userIn := c.ReadLine()
+
+			user := domain.NewUser(userIn)
 
 			tweet := domain.NewTweet(user, text)
 
@@ -44,11 +48,16 @@ func main() {
 
 			defer c.ShowPrompt(true)
 
+			c.Print("Write the tweet id: ")
+
+			id := c.ReadLine()
+			idAux, _ := strconv.Atoi(id)
+
 			tweets := service.GetTweets()
 
-			c.Println(tweets[len(tweets)-1].Text)
-			c.Println("@", tweets[len(tweets)-1].User)
-			c.Println(tweets[len(tweets)-1].Date)
+			c.Println(tweets[idAux].Text)
+			c.Println("@", tweets[idAux].User)
+			c.Println(tweets[idAux].Date)
 
 			return
 		},
