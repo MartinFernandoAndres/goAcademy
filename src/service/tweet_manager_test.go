@@ -112,3 +112,41 @@ func TestCanRetrieveTweetById(t *testing.T) {
 
 	isValidTweet(t, publishedTweet, user, text, id)
 }
+
+func TestMap(t *testing.T) {
+	var tweet, secondTweet, thirdTweet *domain.Tweet
+
+	service.InitializeService()
+	userIn := "grupoesfera"
+	user := domain.NewUser(userIn)
+	anotherUserIn := "nick"
+	anotherUser := domain.NewUser(anotherUserIn)
+	text := "Twiit"
+	secondText := "2do Twiit"
+	tweet = domain.NewTweet(user, text)
+	secondTweet = domain.NewTweet(user, secondText)
+	thirdTweet = domain.NewTweet(anotherUser, text)
+
+	firstId, _ := service.PublishTweet(tweet)
+	secondId, _ := service.PublishTweet(secondTweet)
+	thirdId, _ := service.PublishTweet(thirdTweet)
+
+	tweets := service.GetTweetsByUser(user)
+
+	if len(tweets) != 2 {
+		t.Errorf("expected size 2 but was %d", len(tweets))
+	}
+
+	firstPublishedTweet := tweets[0]
+	secondPublishedTweet := tweets[1]
+
+	if !isValidTweet(t, firstPublishedTweet, user, text, firstId) {
+		return
+	}
+	if !isValidTweet(t, secondPublishedTweet, user, text, secondId) {
+		return
+	}
+	if !isValidTweet(t, secondPublishedTweet, user, text, thirdId) {
+		return
+	}
+}

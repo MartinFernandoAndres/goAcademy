@@ -5,6 +5,7 @@ import "fmt"
 
 // var tweet *domain.Tweet
 var tweets []*domain.Tweet
+var tweetsByUser map[domain.User][]*domain.Tweet
 var users []domain.User
 var userNow domain.User
 
@@ -25,7 +26,9 @@ func PublishTweet(tweet2 *domain.Tweet) (int, error) {
 
 	userNow = tweet2.User
 
+	tweetsByUser[tweet2.User] = append(tweetsByUser[tweet2.User], tweet2)
 	tweets = append(tweets, tweet2)
+
 	return len(tweets) - 1, fmt.Errorf("tweet ok")
 }
 
@@ -46,11 +49,16 @@ func isRegistered(user domain.User) bool {
 	return false
 }
 
-func InitializeService() []*domain.Tweet {
+func InitializeService() ([]*domain.Tweet, map[domain.User][]*domain.Tweet) {
 	tweets := make([]*domain.Tweet, 4)
-	return tweets
+	tweetsByUser = make(map[domain.User][]*domain.Tweet)
+	return tweets, tweetsByUser
 }
 
 func GetTweetById(id int) *domain.Tweet {
 	return tweets[id]
+}
+
+func GetTweetsByUser(user domain.User) []*domain.Tweet {
+	return tweetsByUser[user]
 }
