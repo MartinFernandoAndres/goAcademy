@@ -1,14 +1,12 @@
 package domain
 
-import "time"
-
 type Tweet struct {
 	User string
 	Text string
-	Date time.Date
+	//Date time.Date
 }
 
 func NewTweet(userIn, textIn string) *Tweet {
-	tweet := Tweet{userIn, textIn, time.Now().Date}
+	tweet := Tweet{userIn, textIn /*, time.Date.Now()*/}
 	return &tweet
 }

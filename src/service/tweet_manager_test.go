@@ -34,3 +34,26 @@ func TestPublishedTweetIsSaved(t *testing.T) {
 	// }
 
 }
+
+func TestTweetWithoutTextIsNotPublished(t *testing.T) {
+
+	var tweet *domain.Tweet
+
+	user := "grupoEsfera"
+	var text string
+	text = ""
+
+	tweet = domain.NewTweet(user, text)
+
+	var err error
+	err = service.PublishTweet(tweet)
+
+	if err == nil {
+		t.Error("Expected error")
+		return
+	}
+
+	if err.Error() != "text is required" {
+		t.Error("Expected error is text is required")
+	}
+}
