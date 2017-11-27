@@ -44,29 +44,47 @@ func main() {
 
 			defer c.ShowPrompt(true)
 
-			tweet := service.GetTweet()
+			tweets := service.GetTweets()
 
-			c.Println(tweet.Text)
-			c.Println("@", tweet.User)
+			c.Println(tweets[len(tweets)-1].Text)
+			c.Println("@", tweets[len(tweets)-1].User)
+			c.Println(tweets[len(tweets)-1].Date)
 
 			return
 		},
 	})
-
 	shell.AddCmd(&ishell.Cmd{
-		Name: "showUser",
-		Help: "Shows a user",
+		Name: "showTweets",
+		Help: "Shows a tweet",
 		Func: func(c *ishell.Context) {
 
 			defer c.ShowPrompt(true)
 
-			tweet := service.GetTweet()
+			tweets := service.GetTweets()
 
-			c.Println(tweet.User)
-
+			for i := 0; i < len(tweets); i++ {
+				c.Println(tweets[i].Text)
+				c.Println("@", tweets[i].User)
+				c.Println(tweets[i].Date)
+			}
 			return
 		},
 	})
+
+	// shell.AddCmd(&ishell.Cmd{
+	// 	Name: "showUser",
+	// 	Help: "Shows a user",
+	// 	Func: func(c *ishell.Context) {
+
+	// 		defer c.ShowPrompt(true)
+
+	// 		tweet := service.GetTweet()
+
+	// 		c.Println(tweet.User)
+
+	// 		return
+	// 	},
+	// })
 
 	shell.Run()
 

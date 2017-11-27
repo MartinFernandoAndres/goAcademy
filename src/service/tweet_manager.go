@@ -3,7 +3,8 @@ package service
 import "github.com/goAcademy/src/domain"
 import "fmt"
 
-var tweet *domain.Tweet
+// var tweet *domain.Tweet
+var tweets []*domain.Tweet
 
 func PublishTweet(tweet2 *domain.Tweet) error {
 	if tweet2.Text == "" {
@@ -16,10 +17,14 @@ func PublishTweet(tweet2 *domain.Tweet) error {
 		return fmt.Errorf("text exceeds 140 characters")
 	}
 
-	tweet = tweet2
+	tweets = append(tweets, tweet2)
 	return nil
 }
 
-func GetTweet() *domain.Tweet {
-	return tweet
+func GetTweets() []*domain.Tweet {
+	return tweets
+}
+func InitializeService() []*domain.Tweet {
+	tweets := make([]*domain.Tweet, 4)
+	return tweets
 }
