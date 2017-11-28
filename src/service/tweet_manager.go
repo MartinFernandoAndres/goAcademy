@@ -4,61 +4,127 @@ import "github.com/goAcademy/src/domain"
 import "fmt"
 
 // var tweet *domain.Tweet
-var tweets []*domain.Tweet
-var tweetsByUser map[domain.User][]*domain.Tweet
-var users []domain.User
-var userNow domain.User
 
-func PublishTweet(tweet2 *domain.Tweet) (int, error) {
+type Twitter struct {
+	tweets       []*domain.Tweet
+	tweetsByUser map[string][]*domain.Tweet
+	users        []domain.User
+	loguedUsers  []domain.User
+}
+
+func (t *Twitter) PublishTweet(tweet2 *domain.Tweet) (int, error) {
 	if tweet2.Text == "" {
 		return -1, fmt.Errorf("text is required")
 	}
-	if tweet2.User.User == "" {
+	if tweet2.User == "" {
 		return -1, fmt.Errorf("user is required")
 	}
 	if len(tweet2.Text) > 140 {
 		return -1, fmt.Errorf("text exceeds 140 characters")
 	}
 
-	if !isRegistered(tweet2.User) {
-		users = append(users, tweet2.User)
+	if !t.isRegistered(tweet2.User) {
+		return -1, fmt.Errorf("User is not registed")
 	}
 
-	userNow = tweet2.User
+	if !t.isLoggued(tweet2.User) {
+		return -1, fmt.Errorf("User is not logged")
+	}
+	if t.isDuplicated(tweet2) {
+		return -1, fmt.Errorf("tweet is duplicated")
+	}
+	t.tweetsByUser[tweet2.User] = append(t.tweetsByUser[tweet2.User], tweet2)
+	t.tweets = append(t.tweets, tweet2)
 
-	tweetsByUser[tweet2.User] = append(tweetsByUser[tweet2.User], tweet2)
-	tweets = append(tweets, tweet2)
-
-	return len(tweets) - 1, fmt.Errorf("tweet ok")
+	return len(t.tweets) - 1, fmt.Errorf("tweet ok")
 }
 
-func GetTweets() []*domain.Tweet {
-	return tweets
+// func (t* Twitter) Erase (text string){
+
+// }
+
+func (t *Twitter) isLoggued(user string) bool {
+	for i := 0; i < len(t.loguedUsers); i++ {
+		if t.loguedUsers[i].User == user {
+			return true
+		}
+	}
+	return false
+
 }
 
-func GetUsers() []domain.User {
-	return users
-}
-
-func isRegistered(user domain.User) bool {
-	for i := 0; i < len(users); i++ {
-		if users[i].User == user.User {
+func (t *Twitter) isDuplicated(tweet *domain.Tweet) bool {
+	for i := 0; i < len(t.GetTweetsByUser(tweet.User)); i++ {
+		if t.GetTweetsByUser(tweet.User)[i].Text == tweet.Text {
 			return true
 		}
 	}
 	return false
 }
 
-func InitializeService() ([]*domain.Tweet, map[domain.User][]*domain.Tweet) {
-	tweets := make([]*domain.Tweet, 4)
-	tweetsByUser = make(map[domain.User][]*domain.Tweet)
-	return tweets, tweetsByUser
+func (t *Twitter) LogIn(name, pass string) {
+	for i := 0; i < len(t.users); i++ {
+		if (t.users[i].Mail == name || t.users[i].Nick == name) && t.users[i].Pass == pass && !t.isLoggued(t.users[i].User) {
+			t.loguedUsers = append(t.loguedUsers, t.users[i])
+		}
+	}
 }
 
-func GetTweetById(id int) *domain.Tweet {
-	return tweets[id]
+func (t *Twitter) GetTweets() []*domain.Tweet {
+	return t.tweets
 }
 
-func GetTweetsByUser(user domain.User) []*domain.Tweet {
-	return tweetsByUser[user]
+func (t *Twitter) GetUsers() []domain.User {
+	return t.users
+}
+
+func (t *Twitter) isRegistered(user string) bool {
+	for i := 0; i < len(t.users); i++ {
+		if t.users[i].User == user {
+			return true
+		}
+	}
+	return false
+}
+
+func (t *Twitter) InitializeService() ([]*domain.Tweet, map[string][]*domain.Tweet, []domain.User) {
+	t.tweets = make([]*domain.Tweet, 0)
+	t.tweetsByUser = make(map[string][]*domain.Tweet)
+	t.users = make([]domain.User, 0) //ACA PUEDE FALLAR EL =s
+	return t.tweets, t.tweetsByUser, t.users
+}
+
+func (t *Twitter) LogOut(user string) {
+	for i := 0; i < len(t.loguedUsers); i++ {
+		if t.loguedUsers[i].User == user {
+			for j := 0; j < i; j++ {
+				t.loguedUsers = append(t.loguedUsers, t.loguedUsers[j])
+			}
+		}
+	}
+}
+
+func (t *Twitter) GetTweetById(id int) *domain.Tweet {
+	return t.tweets[id]
+}
+
+func (t *Twitter) GetUser(user string) domain.User {
+	for i := 0; i < len(t.users); i++ {
+		if t.users[i].User == user {
+			return t.users[i]
+		}
+	}
+	return domain.NewUser("", "", "", "")
+}
+
+func (t *Twitter) GetTweetsByUser(user string) []*domain.Tweet {
+	return t.tweetsByUser[user]
+}
+
+func (t *Twitter) Register(user domain.User) (int, error) {
+	if t.isRegistered(user.User) {
+		return -1, fmt.Errorf("User is already registed")
+	}
+	t.users = append(t.users, user)
+	return 0, fmt.Errorf("")
 }
