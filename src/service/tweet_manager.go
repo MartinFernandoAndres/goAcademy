@@ -39,9 +39,32 @@ func (t *Twitter) PublishTweet(tweet2 *domain.Tweet) (int, error) {
 	return len(t.tweets) - 1, fmt.Errorf("tweet ok")
 }
 
-// func (t* Twitter) Erase (text string){
-
-// }
+func (t *Twitter) Erase(text, user string) {
+	for i := 0; i < len(t.tweets); i++ {
+		tweetsAux := make([]*domain.Tweet, 0)
+		if t.tweets[i].User == user && t.tweets[i].Text == text {
+			for j := 0; j < i; j++ {
+				tweetsAux = append(tweetsAux, t.tweets[j])
+			}
+			for j := i; j < len(t.tweets); j++ {
+				tweetsAux = append(tweetsAux, t.tweets[j])
+			}
+		}
+		t.tweets = tweetsAux
+	}
+	for i := 0; i < len(t.GetTweetsByUser(user)); i++ {
+		tweetsAux := make([]*domain.Tweet, 0)
+		if t.GetTweetsByUser(user)[i].Text == text {
+			for j := 0; j < i; j++ {
+				tweetsAux = append(tweetsAux, t.GetTweetsByUser(user)[j])
+			}
+			for j := i; j < len(t.GetTweetsByUser(user)); j++ {
+				tweetsAux = append(tweetsAux, t.GetTweetsByUser(user)[j])
+			}
+		}
+		t.tweetsByUser[user] = tweetsAux
+	}
+}
 
 func (t *Twitter) isLoggued(user string) bool {
 	for i := 0; i < len(t.loguedUsers); i++ {
@@ -98,6 +121,9 @@ func (t *Twitter) LogOut(user string) {
 	for i := 0; i < len(t.loguedUsers); i++ {
 		if t.loguedUsers[i].User == user {
 			for j := 0; j < i; j++ {
+				t.loguedUsers = append(t.loguedUsers, t.loguedUsers[j])
+			}
+			for j := i; j < len(t.loguedUsers); j++ {
 				t.loguedUsers = append(t.loguedUsers, t.loguedUsers[j])
 			}
 		}
