@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type Tweet struct {
 	User string
@@ -15,13 +17,15 @@ func NewTweet(userIn string, textIn string) *Tweet {
 }
 
 type User struct {
-	User string
-	Mail string
-	Nick string
-	Pass string
+	User             string
+	Mail             string
+	Nick             string
+	Pass             string
+	IFollowThisUsers []User
 }
 
 func NewUser(user, mail, nick, pass string) User {
-	User := User{user, mail, nick, pass}
+	iFollowThisUsers := make([]User, 0)
+	User := User{user, mail, nick, pass, iFollowThisUsers}
 	return User
 }

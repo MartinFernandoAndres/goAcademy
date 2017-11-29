@@ -211,6 +211,32 @@ func main() {
 		},
 	})
 
+	shell.AddCmd(&ishell.Cmd{
+		Name: "modifyTweet",
+		Help: "modifies a tweet",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Write the user: ")
+			user := c.ReadLine()
+
+			c.Print("Write the new tweet: ")
+			tweet := c.ReadLine()
+
+			c.Print("Write the tweet id: ")
+
+			id := c.ReadLine()
+			idAux, _ := strconv.Atoi(id)
+
+			twitter.Modify(idAux, tweet, user)
+
+			c.Println("succes")
+
+			return
+		},
+	})
+
 	shell.Run()
 
 }

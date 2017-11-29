@@ -121,9 +121,9 @@ func TestMap(t *testing.T) {
 
 	twitter.InitializeService()
 	userIn := "grupoesfera"
-	user := domain.NewUser(userIn, "", "", "")
+	user := domain.NewUser(userIn, "a", "a", "a")
 	anotherUserIn := "nick"
-	anotherUser := domain.NewUser(anotherUserIn, "", "", "")
+	anotherUser := domain.NewUser(anotherUserIn, "b", "b", "b")
 	text := "Twiit"
 	secondText := "2do Twiit"
 	tweet = domain.NewTweet(user.User, text)
@@ -132,8 +132,8 @@ func TestMap(t *testing.T) {
 
 	twitter.Register(user)
 	twitter.Register(anotherUser)
-	twitter.LogIn("", "")
-	twitter.LogIn("", "")
+	twitter.LogIn("a", "a")
+	twitter.LogIn("b", "b")
 
 	firstId, _ := twitter.PublishTweet(tweet)
 	twitter.PublishTweet(secondTweet)
@@ -147,22 +147,18 @@ func TestMap(t *testing.T) {
 	if !isValidTweet(t, firstPublishedTweet, user.User, text, firstId) {
 		return
 	}
-	// if !isValidTweet(t, secondPublishedTweet, user.User, text, secondId) {
-	// 	return
-	// }
-	// if !isValidTweet(t, secondPublishedTweet, user.User, text, thirdId) {
-	// 	return
-	// }
 
-	twitter.Erase(text, userIn)
-	twitter.Erase(secondText, userIn)
+	twitter.Modify(firstId, "secondText", userIn)
+	//twitter.(secondText, userIn)
 
-	tweetsUser := twitter.GetTweetsByUser(userIn)
+	//tweetsUser := twitter.GetTweetsByUser(userIn)
 
-	println(tweetsUser)
-
-	if len(twitter.GetTweetsByUser(userIn)) != 0 {
-		t.Errorf("expected size 0 but was %d", len(twitter.GetTweetsByUser(userIn)))
+	if twitter.GetTweets()[firstId].Text != "secondText" {
+		t.Errorf("expected tweet text to be ", "secondText")
+	}
+	twitter.Modify(firstId, "2do Twiit", userIn)
+	if twitter.GetTweets()[firstId].Text != "secondText" {
+		t.Errorf("expected tweet text to be ", "secondText")
 	}
 
 }

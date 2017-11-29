@@ -151,3 +151,30 @@ func (t *Twitter) Register(user domain.User) (int, error) {
 	t.users = append(t.users, user)
 	return 0, fmt.Errorf("")
 }
+
+func (t *Twitter) Modify(id int, text, user string) {
+	tweet := domain.NewTweet(user, text)
+	if !t.isDuplicated(tweet) {
+		t.tweets[id].Text = text
+	}
+}
+
+func (t *Twitter) Follow(userFollower, userToFollow string) {
+	w := 0
+	for i := 0; i < len(t.users); i++ {
+		if t.users[i].User == userToFollow {
+			for j := 0; j < len(t.users); j++ {
+				if t.users[j].User == userFollower {
+					for k := 0; k < len(t.users[j].IFollowThisUsers); k++ {
+						if t.users[j].IFollowThisUsers[k].User == t.users[i].User {
+							w++
+						}
+					}
+					if w == 0 {
+						t.users[j].IFollowThisUsers = append(t.users[j].IFollowThisUsers, t.users[i])
+					}
+				}
+			}
+		}
+	}
+}
