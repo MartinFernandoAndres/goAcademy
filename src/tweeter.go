@@ -172,6 +172,45 @@ func main() {
 			return
 		},
 	})
+	shell.AddCmd(&ishell.Cmd{
+		Name: "logOut",
+		Help: "logs out a user",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Write the user: ")
+			user := c.ReadLine()
+
+			twitter.LogOut(user)
+
+			c.Println("succes")
+
+			return
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "eraseTweet",
+		Help: "deletes a tweet",
+		Func: func(c *ishell.Context) {
+
+			defer c.ShowPrompt(true)
+
+			c.Print("Write the user: ")
+			user := c.ReadLine()
+
+			c.Print("Write the tweet: ")
+			tweet := c.ReadLine()
+
+			twitter.Erase(user, tweet)
+
+			c.Println("succes")
+
+			return
+		},
+	})
+
 	shell.Run()
 
 }

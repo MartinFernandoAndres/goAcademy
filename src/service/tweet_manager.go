@@ -54,11 +54,8 @@ func (t *Twitter) Erase(text, user string) {
 	}
 	for i := 0; i < len(t.GetTweetsByUser(user)); i++ {
 		tweetsAux := make([]*domain.Tweet, 0)
-		if t.GetTweetsByUser(user)[i].Text == text {
-			for j := 0; j < i; j++ {
-				tweetsAux = append(tweetsAux, t.GetTweetsByUser(user)[j])
-			}
-			for j := i; j < len(t.GetTweetsByUser(user)); j++ {
+		for j := 0; j < len(t.GetTweetsByUser(user)); j++ {
+			if t.GetTweetsByUser(user)[j].Text != text {
 				tweetsAux = append(tweetsAux, t.GetTweetsByUser(user)[j])
 			}
 		}

@@ -136,25 +136,33 @@ func TestMap(t *testing.T) {
 	twitter.LogIn("", "")
 
 	firstId, _ := twitter.PublishTweet(tweet)
-	secondId, _ := twitter.PublishTweet(secondTweet)
-	thirdId, _ := twitter.PublishTweet(thirdTweet)
+	twitter.PublishTweet(secondTweet)
+	twitter.PublishTweet(thirdTweet)
 
 	tweets := twitter.GetTweetsByUser(user.User)
 
-	if len(tweets) != 2 {
-		t.Errorf("expected size 2 but was %d", len(tweets))
-	}
-
 	firstPublishedTweet := tweets[0]
-	secondPublishedTweet := tweets[1]
+	//secondPublishedTweet := tweets[1]
 
 	if !isValidTweet(t, firstPublishedTweet, user.User, text, firstId) {
 		return
 	}
-	if !isValidTweet(t, secondPublishedTweet, user.User, text, secondId) {
-		return
+	// if !isValidTweet(t, secondPublishedTweet, user.User, text, secondId) {
+	// 	return
+	// }
+	// if !isValidTweet(t, secondPublishedTweet, user.User, text, thirdId) {
+	// 	return
+	// }
+
+	twitter.Erase(text, userIn)
+	twitter.Erase(secondText, userIn)
+
+	tweetsUser := twitter.GetTweetsByUser(userIn)
+
+	println(tweetsUser)
+
+	if len(twitter.GetTweetsByUser(userIn)) != 0 {
+		t.Errorf("expected size 0 but was %d", len(twitter.GetTweetsByUser(userIn)))
 	}
-	if !isValidTweet(t, secondPublishedTweet, user.User, text, thirdId) {
-		return
-	}
+
 }
