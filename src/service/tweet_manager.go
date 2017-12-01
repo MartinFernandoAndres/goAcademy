@@ -3,37 +3,37 @@ package service
 import "github.com/goAcademy/src/domain"
 import "fmt"
 
-// var tweet *domain.Tweet
+// var tweet domain.Tweet
 
 type Twitter struct {
-	tweets       []*domain.Tweet
-	tweetsByUser map[string][]*domain.Tweet
+	tweets       []domain.Tweet
+	tweetsByUser map[string][]domain.Tweet
 	users        []domain.User
 	loguedUsers  []domain.User
 }
 
-func (t *Twitter) PublishTweet(tweet2 *domain.Tweet) (int, error) {
-	if tweet2.Text == "" {
+func (t *Twitter) PublishTweet(tweet2 domain.Tweet) (int, error) {
+	if tweet2.GetText() == "" {
 		return -1, fmt.Errorf("text is required")
 	}
-	if tweet2.User == "" {
+	if tweet2.GetUser().User == "" {
 		return -1, fmt.Errorf("user is required")
 	}
-	if len(tweet2.Text) > 140 {
+	if len(tweet2.GetText()) > 140 {
 		return -1, fmt.Errorf("text exceeds 140 characters")
 	}
 
-	if !t.isRegistered(tweet2.User) {
+	if !t.isRegistered(tweet2.GetUser().User) {
 		return -1, fmt.Errorf("User is not registed")
 	}
 
-	if !t.isLoggued(tweet2.User) {
+	if !t.isLoggued(tweet2.GetUser().User) {
 		return -1, fmt.Errorf("User is not logged")
 	}
-	if t.isDuplicated(tweet2) {
+	if t.isDuplicated(tweet2.GetUser().User, tweet2.GetText()) {
 		return -1, fmt.Errorf("tweet is duplicated")
 	}
-	t.tweetsByUser[tweet2.User] = append(t.tweetsByUser[tweet2.User], tweet2)
+	t.tweetsByUser[tweet2.GetUser().User] = append(t.tweetsByUser[tweet2.GetUser().User], tweet2)
 	t.tweets = append(t.tweets, tweet2)
 
 	return len(t.tweets) - 1, fmt.Errorf("tweet ok")
@@ -41,8 +41,8 @@ func (t *Twitter) PublishTweet(tweet2 *domain.Tweet) (int, error) {
 
 func (t *Twitter) Erase(text, user string) {
 	for i := 0; i < len(t.tweets); i++ {
-		tweetsAux := make([]*domain.Tweet, 0)
-		if t.tweets[i].User == user && t.tweets[i].Text == text {
+		tweetsAux := make([]domain.Tweet, 0)
+		if t.tweets[i].GetUser().User == user && t.tweets[i].GetText() == text {
 			for j := 0; j < i; j++ {
 				tweetsAux = append(tweetsAux, t.tweets[j])
 			}
@@ -53,9 +53,9 @@ func (t *Twitter) Erase(text, user string) {
 		t.tweets = tweetsAux
 	}
 	for i := 0; i < len(t.GetTweetsByUser(user)); i++ {
-		tweetsAux := make([]*domain.Tweet, 0)
+		tweetsAux := make([]domain.Tweet, 0)
 		for j := 0; j < len(t.GetTweetsByUser(user)); j++ {
-			if t.GetTweetsByUser(user)[j].Text != text {
+			if t.GetTweetsByUser(user)[j].GetText() != text {
 				tweetsAux = append(tweetsAux, t.GetTweetsByUser(user)[j])
 			}
 		}
@@ -73,9 +73,9 @@ func (t *Twitter) isLoggued(user string) bool {
 
 }
 
-func (t *Twitter) isDuplicated(tweet *domain.Tweet) bool {
-	for i := 0; i < len(t.GetTweetsByUser(tweet.User)); i++ {
-		if t.GetTweetsByUser(tweet.User)[i].Text == tweet.Text {
+func (t *Twitter) isDuplicated(user, text string) bool {
+	for i := 0; i < len(t.GetTweetsByUser(user)); i++ {
+		if t.GetTweetsByUser(user)[i].GetText() == text {
 			return true
 		}
 	}
@@ -90,7 +90,7 @@ func (t *Twitter) LogIn(name, pass string) {
 	}
 }
 
-func (t *Twitter) GetTweets() []*domain.Tweet {
+func (t *Twitter) GetTweets() []domain.Tweet {
 	return t.tweets
 }
 
@@ -107,9 +107,9 @@ func (t *Twitter) isRegistered(user string) bool {
 	return false
 }
 
-func (t *Twitter) InitializeService() ([]*domain.Tweet, map[string][]*domain.Tweet, []domain.User) {
-	t.tweets = make([]*domain.Tweet, 0)
-	t.tweetsByUser = make(map[string][]*domain.Tweet)
+func (t *Twitter) InitializeService() ([]domain.Tweet, map[string][]domain.Tweet, []domain.User) {
+	t.tweets = make([]domain.Tweet, 0)
+	t.tweetsByUser = make(map[string][]domain.Tweet)
 	t.users = make([]domain.User, 0) //ACA PUEDE FALLAR EL =s
 	return t.tweets, t.tweetsByUser, t.users
 }
@@ -127,7 +127,7 @@ func (t *Twitter) LogOut(user string) {
 	}
 }
 
-func (t *Twitter) GetTweetById(id int) *domain.Tweet {
+func (t *Twitter) GetTweetById(id int) domain.Tweet {
 	return t.tweets[id]
 }
 
@@ -140,7 +140,7 @@ func (t *Twitter) GetUser(user string) domain.User {
 	return domain.NewUser("", "", "", "")
 }
 
-func (t *Twitter) GetTweetsByUser(user string) []*domain.Tweet {
+func (t *Twitter) GetTweetsByUser(user string) []domain.Tweet {
 	return t.tweetsByUser[user]
 }
 
@@ -153,9 +153,8 @@ func (t *Twitter) Register(user domain.User) (int, error) {
 }
 
 func (t *Twitter) Modify(id int, text, user string) {
-	tweet := domain.NewTweet(user, text)
-	if !t.isDuplicated(tweet) {
-		t.tweets[id].Text = text
+	if !t.isDuplicated(user, text) {
+		t.tweets[id].SetText(text)
 	}
 }
 

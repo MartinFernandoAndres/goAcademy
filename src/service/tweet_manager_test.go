@@ -88,8 +88,8 @@ func TestAsdf(t *testing.T) {
 	}
 }*/
 
-func isValidTweet(t *testing.T, firstPublishedTweet *domain.Tweet, user string, text string, id int) bool {
-	res := firstPublishedTweet.User == user && firstPublishedTweet.Text == text //&& service.GetTweets[id] == firstPublishedTweet
+func isValidTweet(t *testing.T, firstPublishedTweet domain.Tweet, user string, text string, id int) bool {
+	res := firstPublishedTweet.GetUser().User == user && firstPublishedTweet.GetText() == text //&& service.GetTweets[id] == firstPublishedTweet
 	return res
 }
 
@@ -115,7 +115,7 @@ func TestCanRetrieveTweetById(t *testing.T) {
 }*/
 
 func TestMap(t *testing.T) {
-	var tweet, secondTweet, thirdTweet *domain.Tweet
+	var tweet, secondTweet, thirdTweet domain.Tweet
 
 	var twitter service.Twitter
 
@@ -126,9 +126,9 @@ func TestMap(t *testing.T) {
 	anotherUser := domain.NewUser(anotherUserIn, "b", "b", "b")
 	text := "Twiit"
 	secondText := "2do Twiit"
-	tweet = domain.NewTweet(user.User, text)
-	secondTweet = domain.NewTweet(user.User, secondText)
-	thirdTweet = domain.NewTweet(anotherUser.User, text)
+	tweet = domain.NewTextTweet(user, text)
+	secondTweet = domain.NewTextTweet(user, secondText)
+	thirdTweet = domain.NewTextTweet(anotherUser, text)
 
 	twitter.Register(user)
 	twitter.Register(anotherUser)
@@ -153,11 +153,11 @@ func TestMap(t *testing.T) {
 
 	//tweetsUser := twitter.GetTweetsByUser(userIn)
 
-	if twitter.GetTweets()[firstId].Text != "secondText" {
+	if twitter.GetTweets()[firstId].GetText() != "secondText" {
 		t.Errorf("expected tweet text to be ", "secondText")
 	}
 	twitter.Modify(firstId, "2do Twiit", userIn)
-	if twitter.GetTweets()[firstId].Text != "secondText" {
+	if twitter.GetTweets()[firstId].GetText() != "secondText" {
 		t.Errorf("expected tweet text to be ", "secondText")
 	}
 
