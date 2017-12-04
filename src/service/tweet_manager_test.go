@@ -161,4 +161,6 @@ func TestMap(t *testing.T) {
 		t.Errorf("expected tweet text to be ", "secondText")
 	}
 
+	twitter.Erase("secondText", userIn)
+
 }

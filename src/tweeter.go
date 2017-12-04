@@ -6,11 +6,17 @@ import (
 	"github.com/abiosoft/ishell"
 	"github.com/goAcademy/src/domain"
 	"github.com/goAcademy/src/service"
+	"github.com/goAcademy/src/rest"
 )
 
 func main() {
-	var twitter service.Twitter
+
+
+	 twitter := new( service.Twitter)
 	twitter.InitializeService()
+
+	ginServer := rest.NewGinServer(twitter)
+	ginServer.StartGinServer()
 
 	shell := ishell.New()
 	shell.SetPrompt("Tweeter >> ")
@@ -31,9 +37,9 @@ func main() {
 
 			userIn := c.ReadLine()
 
-			//user := domain.NewUser(userIn)
+			user := twitter.GetUser(userIn)
 
-			tweet := domain.NewTweet(userIn, text)
+			tweet := domain.NewTextTweet(user, text)
 
 			_, toPrint := twitter.PublishTweet(tweet)
 
@@ -57,9 +63,7 @@ func main() {
 
 			tweets := twitter.GetTweets()
 
-			c.Println(tweets[idAux].Text)
-			c.Println("@", tweets[idAux].User)
-			c.Println(tweets[idAux].Date)
+			c.Println(tweets[idAux].PrintableTweet())
 
 			return
 		},
@@ -75,9 +79,7 @@ func main() {
 			tweets := twitter.GetTweets()
 
 			for i := 0; i < len(tweets); i++ {
-				c.Println(tweets[i].Text)
-				c.Println("@", tweets[i].User)
-				c.Println(tweets[i].Date)
+				c.Println(tweets[i].PrintableTweet())
 			}
 			return
 		},
@@ -96,9 +98,7 @@ func main() {
 			tweets := twitter.GetTweetsByUser(user)
 
 			for i := 0; i < len(tweets); i++ {
-				c.Println(tweets[i].Text)
-				c.Println("@", tweets[i].User)
-				c.Println(tweets[i].Date)
+				c.Println(tweets[i].PrintableTweet())
 			}
 
 			c.Println(tweets)

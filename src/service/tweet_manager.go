@@ -12,6 +12,106 @@ type Twitter struct {
 	loguedUsers  []domain.User
 }
 
+///database related
+//initializes service
+func (t *Twitter) InitializeService() ([]domain.Tweet, map[string][]domain.Tweet, []domain.User) {
+	t.tweets = make([]domain.Tweet, 0)
+	t.tweetsByUser = make(map[string][]domain.Tweet)
+	t.users = make([]domain.User, 0) //ACA PUEDE FALLAR EL =s
+	return t.tweets, t.tweetsByUser, t.users
+}
+
+//get all the tweets
+func (t *Twitter) GetTweets() []domain.Tweet {
+	return t.tweets
+}
+
+//get all the users
+func (t *Twitter) GetUsers() []domain.User {
+	return t.users
+}
+
+//get tweet numbrer
+func (t *Twitter) GetTweetById(id int) domain.Tweet {
+	return t.tweets[id]
+}
+
+//get a user
+func (t *Twitter) GetUser(user string) domain.User {
+	for i := 0; i < len(t.users); i++ {
+		if t.users[i].User == user {
+			return t.users[i]
+		}
+	}
+	return domain.NewUser("", "", "", "")
+}
+
+//get user tweets
+func (t *Twitter) GetTweetsByUser(user string) []domain.Tweet {
+	return t.tweetsByUser[user]
+}
+
+
+
+///user related
+//regist a user
+func (t *Twitter) Register(user domain.User) (int, error) {
+	if t.isRegistered(user.User) {
+		return -1, fmt.Errorf("User is already registed")
+	}
+	t.users = append(t.users, user)
+	return 0, fmt.Errorf("")
+}
+
+
+//Logs in a user
+func (t *Twitter) LogIn(name, pass string) {
+	for i := 0; i < len(t.users); i++ {
+		if (t.users[i].Mail == name || t.users[i].Nick == name) && t.users[i].Pass == pass && !t.isLoggued(t.users[i].User) {
+			t.loguedUsers = append(t.loguedUsers, t.users[i])
+		}
+	}
+}
+
+//Logs uot a user
+func (t *Twitter) LogOut(user string) {
+	for i := 0; i < len(t.loguedUsers); i++ {
+		if t.loguedUsers[i].User == user {
+			for j := 0; j < i; j++ {
+				t.loguedUsers = append(t.loguedUsers, t.loguedUsers[j])
+			}
+			for j := i; j < len(t.loguedUsers); j++ {
+				t.loguedUsers = append(t.loguedUsers, t.loguedUsers[j])
+			}
+		}
+	}
+}
+
+
+
+//user a follows user b
+func (t *Twitter) Follow(userFollower, userToFollow string) {
+	w := 0
+	for i := 0; i < len(t.users); i++ {
+		if t.users[i].User == userToFollow {
+			for j := 0; j < len(t.users); j++ {
+				if t.users[j].User == userFollower {
+					for k := 0; k < len(t.users[j].IFollowThisUsers); k++ {
+						if t.users[j].IFollowThisUsers[k].User == t.users[i].User {
+							w++
+						}
+					}
+					if w == 0 {
+						t.users[j].IFollowThisUsers = append(t.users[j].IFollowThisUsers, t.users[i])
+					}
+				}
+			}
+		}
+	}
+}
+
+//tweet realted
+///publish a tweet
 func (t *Twitter) PublishTweet(tweet2 domain.Tweet) (int, error) {
 	if tweet2.GetText() == "" {
 		return -1, fmt.Errorf("text is required")
@@ -39,6 +139,14 @@ func (t *Twitter) PublishTweet(tweet2 domain.Tweet) (int, error) {
 	return len(t.tweets) - 1, fmt.Errorf("tweet ok")
 }
 
+//modifys a tweet
+func (t *Twitter) Modify(id int, text, user string) {
+	if !t.isDuplicated(user, text) {
+		t.tweets[id].SetText(text)
+	}
+}
+
+//deletes a tweet
 func (t *Twitter) Erase(text, user string) {
 	for i := 0; i < len(t.tweets); i++ {
 		tweetsAux := make([]domain.Tweet, 0)
@@ -63,6 +171,7 @@ func (t *Twitter) Erase(text, user string) {
 	}
 }
 
+//auxiliary functions
 func (t *Twitter) isLoggued(user string) bool {
 	for i := 0; i < len(t.loguedUsers); i++ {
 		if t.loguedUsers[i].User == user {
@@ -70,7 +179,6 @@ func (t *Twitter) isLoggued(user string) bool {
 		}
 	}
 	return false
-
 }
 
 func (t *Twitter) isDuplicated(user, text string) bool {
@@ -82,22 +190,6 @@ func (t *Twitter) isDuplicated(user, text string) bool {
 	return false
 }
 
-func (t *Twitter) LogIn(name, pass string) {
-	for i := 0; i < len(t.users); i++ {
-		if (t.users[i].Mail == name || t.users[i].Nick == name) && t.users[i].Pass == pass && !t.isLoggued(t.users[i].User) {
-			t.loguedUsers = append(t.loguedUsers, t.users[i])
-		}
-	}
-}
-
-func (t *Twitter) GetTweets() []domain.Tweet {
-	return t.tweets
-}
-
-func (t *Twitter) GetUsers() []domain.User {
-	return t.users
-}
-
 func (t *Twitter) isRegistered(user string) bool {
 	for i := 0; i < len(t.users); i++ {
 		if t.users[i].User == user {
@@ -105,75 +197,4 @@ func (t *Twitter) isRegistered(user string) bool {
 		}
 	}
 	return false
-}
-
-func (t *Twitter) InitializeService() ([]domain.Tweet, map[string][]domain.Tweet, []domain.User) {
-	t.tweets = make([]domain.Tweet, 0)
-	t.tweetsByUser = make(map[string][]domain.Tweet)
-	t.users = make([]domain.User, 0) //ACA PUEDE FALLAR EL =s
-	return t.tweets, t.tweetsByUser, t.users
-}
-
-func (t *Twitter) LogOut(user string) {
-	for i := 0; i < len(t.loguedUsers); i++ {
-		if t.loguedUsers[i].User == user {
-			for j := 0; j < i; j++ {
-				t.loguedUsers = append(t.loguedUsers, t.loguedUsers[j])
-			}
-			for j := i; j < len(t.loguedUsers); j++ {
-				t.loguedUsers = append(t.loguedUsers, t.loguedUsers[j])
-			}
-		}
-	}
-}
-
-func (t *Twitter) GetTweetById(id int) domain.Tweet {
-	return t.tweets[id]
-}
-
-func (t *Twitter) GetUser(user string) domain.User {
-	for i := 0; i < len(t.users); i++ {
-		if t.users[i].User == user {
-			return t.users[i]
-		}
-	}
-	return domain.NewUser("", "", "", "")
-}
-
-func (t *Twitter) GetTweetsByUser(user string) []domain.Tweet {
-	return t.tweetsByUser[user]
-}
-
-func (t *Twitter) Register(user domain.User) (int, error) {
-	if t.isRegistered(user.User) {
-		return -1, fmt.Errorf("User is already registed")
-	}
-	t.users = append(t.users, user)
-	return 0, fmt.Errorf("")
-}
-
-func (t *Twitter) Modify(id int, text, user string) {
-	if !t.isDuplicated(user, text) {
-		t.tweets[id].SetText(text)
-	}
-}
-
-func (t *Twitter) Follow(userFollower, userToFollow string) {
-	w := 0
-	for i := 0; i < len(t.users); i++ {
-		if t.users[i].User == userToFollow {
-			for j := 0; j < len(t.users); j++ {
-				if t.users[j].User == userFollower {
-					for k := 0; k < len(t.users[j].IFollowThisUsers); k++ {
-						if t.users[j].IFollowThisUsers[k].User == t.users[i].User {
-							w++
-						}
-					}
-					if w == 0 {
-						t.users[j].IFollowThisUsers = append(t.users[j].IFollowThisUsers, t.users[i])
-					}
-				}
-			}
-		}
-	}
 }

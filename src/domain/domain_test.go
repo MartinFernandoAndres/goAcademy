@@ -6,9 +6,11 @@ import(
 )
 
 func TestTextTweetPrintsUserAndText(t *testing.T) {
+	userIn := "grupoesfera"
+	user := domain.NewUser(userIn, "a", "a", "a")
 
 	// Initialization
-	tweet := domain.NewTextTweet("grupoesfera", "This is my tweet")
+	tweet := domain.NewTextTweet(user, "This is my tweet")
 
 	// Operation
 	text := tweet.PrintableTweet()
@@ -22,9 +24,11 @@ func TestTextTweetPrintsUserAndText(t *testing.T) {
 }
 
 func TestImageTweetPrintsUserTextAndImageURL(t *testing.T) {
+	userIn := "grupoesfera"
+	user := domain.NewUser(userIn, "a", "a", "a")
 
-	// Initialization
-	tweet := domain.NewImageTweet("grupoesfera", "This is my image", "http://www.grupoesfera.com.ar/common/img/grupoesfera.png")
+	// Initializationv
+	tweet := domain.NewImageTweet(user, "This is my image", "http://www.grupoesfera.com.ar/common/img/grupoesfera.png")
 
 	// Operation
 	text := tweet.PrintableTweet()
@@ -38,10 +42,15 @@ func TestImageTweetPrintsUserTextAndImageURL(t *testing.T) {
 }
 
 func TestQuoteTweetPrintsUserTextAndQuotedTweet(t *testing.T) {
+	userIn := "grupoesfera"
+	user := domain.NewUser(userIn, "a", "a", "a")
+
+	anotherUserIn := "nick"
+	anotherUser := domain.NewUser(anotherUserIn, "b", "b", "b")
 
 	// Initialization
-	quotedTweet := domain.NewTextTweet("grupoesfera", "This is my tweet")
-	tweet := domain.NewQuoteTweet("nick", "Awesome", quotedTweet)
+	quotedTweet := domain.NewTextTweet(user, "This is my tweet")
+	tweet := domain.NewQuoteTweet(anotherUser, "Awesome", quotedTweet)
 
 	// Operation
 	text := tweet.PrintableTweet()
@@ -55,9 +64,11 @@ func TestQuoteTweetPrintsUserTextAndQuotedTweet(t *testing.T) {
 }
 
 func TestCanGetAStringFromATweet(t *testing.T) {
+	userIn := "grupoesfera"
+	user := domain.NewUser(userIn, "a", "a", "a")
 
 	// Initialization
-	tweet := domain.NewTextTweet("grupoesfera", "This is my tweet")
+	tweet := domain.NewTextTweet(user, "This is my tweet")
 
 	// Operation
 	text := tweet.String()
